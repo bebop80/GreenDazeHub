@@ -1,0 +1,17 @@
+export interface Member { name: string; color: string; }
+export interface Payment { date: string; payer: string; }
+export interface Concert { id: string; date: string; name: string; address?: string; }
+export interface Room { id: string; name: string; address?: string; }
+export interface Rehearsal { date: string; from: string; to: string; room: string; notes: string; }
+export interface FutureRehearsal { id: string; date: string; from: string; to: string; room: string; payer?: string; }
+export interface SettingsData { NomeBand?: string; ColoreBand?: string; }
+
+export interface AppData {
+  payments: Payment[];
+  concerts: Concert[];
+  customRooms: Room[];
+  members: Member[];
+  settings: SettingsData;
+  next: Rehearsal;
+  futureRehearsals: FutureRehearsal[];
+}
