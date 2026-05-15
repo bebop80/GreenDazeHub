@@ -38,8 +38,15 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
              className="bg-brand-dark border border-brand-border rounded-xl p-4 flex items-center justify-between group hover:border-brand-green/30 transition-colors"
           >
             <div>
-              <div className="text-[10px] font-mono font-bold text-brand-green uppercase tracking-tighter mb-1">
-                {format(parseISO(fr.date), 'dd MMMM yyyy', { locale: it })}
+              <div className="flex items-center gap-2 mb-1">
+                <div className="text-[10px] font-mono font-bold text-brand-green uppercase tracking-tighter">
+                  {format(parseISO(fr.date), 'dd MMMM yyyy', { locale: it })}
+                </div>
+                {fr.from && (
+                  <div className="text-[9px] font-mono font-bold text-text-secondary bg-white/5 px-1.5 py-0.5 rounded">
+                    {fr.from}{fr.to ? ` — ${fr.to}` : ''}
+                  </div>
+                )}
               </div>
               <div className="font-display font-bold text-sm tracking-wide">
                 {data.customRooms.find(r => r.id === fr.room)?.name || 'UNSPECIFIED HUB'}
