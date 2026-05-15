@@ -30,37 +30,72 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
       </div>
 
       <div className="space-y-4">
-        {data?.concerts.slice().sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map(c => {
-          const dateObj = parseISO(c.date);
-          const isHighlight = isFuture(dateObj) || isToday(dateObj);
+        {(() => {
+          const sorted = [...(data?.concerts || [])].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          const upcoming = sorted.filter(c => isFuture(parseISO(c.date)) || isToday(parseISO(c.date)));
+          const past = sorted.filter(c => !isFuture(parseISO(c.date)) && !isToday(parseISO(c.date))).reverse(); // Newest past first? Or oldest past last? User said "bottom of the list"
           
-          return (
-            <div 
-              key={c.id} 
-              className={cn(
-                "border rounded-2xl p-5 flex items-center justify-between transition-all",
-                isHighlight ? "bg-brand-green/10 border-brand-green/40 shadow-[0_0_15px_-5px_#2d9a56]" : "bg-brand-dark/50 border-brand-border opacity-40 grayscale"
-              )}
-            >
-              <div>
-                <div className="text-[13px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-1">{format(dateObj, 'dd MMM yyyy')}</div>
-                <div className="font-display font-extrabold text-lg text-text-primary group-hover:text-brand-green">{c.name}</div>
-                {c.address && <div className="text-[10px] font-medium flex items-center gap-1.5 text-text-secondary mt-1"><MapPin size={10} className="text-brand-green"/> {c.address}</div>}
+          // Re-merge: upcoming first, then past
+          const displayList = [...upcoming, ...past];
+          const nextConcertId = upcoming[0]?.id;
+
+          return displayList.map(c => {
+            const dateObj = parseISO(c.date);
+            const isPast = !isFuture(dateObj) && !isToday(dateObj);
+            const isNext = c.id === nextConcertId;
+            
+            return (
+              <div 
+                key={c.id} 
+                className={cn(
+                  "border rounded-2xl p-5 flex items-center justify-between transition-all relative overflow-hidden",
+                  isNext && "bg-brand-green/20 border-brand-green shadow-[0_0_25px_-5px_#2d9a56] ring-2 ring-brand-green/20",
+                  !isPast && !isNext && "bg-brand-green/10 border-brand-green/40 shadow-[0_0_15px_-5px_#2d9a56]",
+                  isPast && "bg-brand-dark/30 border-brand-border opacity-60 grayscale-[0.5]"
+                )}
+              >
+                {isNext && (
+                  <div className="absolute top-0 right-0 px-3 py-1 bg-brand-green text-black font-mono font-bold text-[10px] uppercase tracking-tighter rounded-bl-xl">
+                    Next Gig
+                  </div>
+                )}
+                <div>
+                  <div className={cn(
+                    "text-[12px] font-mono font-bold uppercase tracking-widest mb-1",
+                    isPast ? "text-zinc-600" : "text-brand-green/80"
+                  )}>
+                    {format(dateObj, 'dd MMM yyyy')}
+                  </div>
+                  <div className={cn(
+                    "font-display font-extrabold text-lg text-text-primary group-hover:text-brand-green",
+                    isNext && "text-xl text-white"
+                  )}>
+                    {c.name}
+                  </div>
+                  {c.address && (
+                    <div className="text-[10px] font-medium flex items-center gap-1.5 text-text-secondary mt-1">
+                      <MapPin size={10} className={cn(isPast ? "text-zinc-600" : "text-brand-green")}/> 
+                      {c.address}
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-1">
+                  {!isPast && (
+                    <button 
+                      onClick={() => shareInfo(`🎤 Concerto: ${c.name}\n📅 ${format(dateObj, 'd MMMM yyyy')}\n📍 ${c.address}`, 'wa')}
+                      className="p-3 hover:bg-brand-green hover:text-black rounded-xl transition-all"
+                    >
+                      <Share2 size={18} />
+                    </button>
+                  )}
+                  <button onClick={() => { if(confirm('Delete concert?')) apiAction('delete_concert', { id: c.id }) }} className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-1">
-                <button 
-                  onClick={() => shareInfo(`🎤 Concerto: ${c.name}\n📅 ${format(dateObj, 'd MMMM')}\n📍 ${c.address}`, 'wa')}
-                  className="p-3 hover:bg-brand-green hover:text-black rounded-xl transition-all"
-                >
-                  <Share2 size={18} />
-                </button>
-                <button onClick={() => { if(confirm('Delete concert?')) apiAction('delete_concert', { id: c.id }) }} className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl">
-                  <Trash2 size={18} />
-                </button>
-              </div>
-            </div>
-          );
-        })}
+            );
+          });
+        })()}
       </div>
     </section>
   );
