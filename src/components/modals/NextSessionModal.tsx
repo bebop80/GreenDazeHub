@@ -22,6 +22,8 @@ export const NextSessionModal: React.FC<NextSessionModalProps> = ({
   setShowAddRoom,
   apiAction
 }) => {
+  const [isPending, setIsPending] = React.useState(false);
+
   if (!editingNext) return null;
 
   return (
@@ -64,17 +66,53 @@ export const NextSessionModal: React.FC<NextSessionModalProps> = ({
 
           <div className="space-y-3">
             <button 
+              disabled={isPending}
               onClick={async () => {
-               const success = await apiAction('next_rehearsal', { next: rehearsalForm });
-               if(success) setEditingNext(false);
+                if (isPending) return;
+                setIsPending(true);
+                try {
+                  const success = await apiAction('next_rehearsal', { next: rehearsalForm });
+                  if(success) setEditingNext(false);
+                } finally {
+                  setIsPending(false);
+                }
               }}
-              className="w-full bg-brand-green text-black py-5 rounded-2xl font-display font-black text-lg tracking-[0.4em] shadow-2xl shadow-brand-green/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+              className={`w-full py-5 rounded-2xl font-display font-black text-lg tracking-[0.4em] shadow-2xl transition-all flex items-center justify-center gap-2 ${
+                isPending 
+                  ? 'bg-brand-green/50 text-black/50 cursor-not-allowed opacity-80 shadow-none' 
+                  : 'bg-brand-green text-black shadow-brand-green/20 hover:scale-[1.02] active:scale-[0.98]'
+              }`}
             >
-              PUBBLICA
+              {isPending ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  PUBBLICAZIONE...
+                </>
+              ) : (
+                "PUBBLICA"
+              )}
             </button>
             <div className="flex gap-3">
-              <button onClick={() => { apiAction('clear_next_rehearsal', {}); setEditingNext(false); }} className="flex-1 bg-red-950/30 border border-red-500/50 text-red-500 py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest">Cancella Dati</button>
-              <button onClick={() => setEditingNext(false)} className="flex-1 bg-zinc-800 py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest text-text-secondary">Annulla</button>
+              <button 
+                disabled={isPending}
+                onClick={async () => {
+                  if (isPending) return;
+                  setIsPending(true);
+                  try {
+                    await apiAction('clear_next_rehearsal', {});
+                    setEditingNext(false);
+                  } finally {
+                    setIsPending(false);
+                  }
+                }} 
+                className="flex-1 bg-red-950/30 border border-red-500/50 text-red-500 py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancella Dati
+              </button>
+              <button disabled={isPending} onClick={() => setEditingNext(false)} className="flex-1 bg-zinc-800 py-4 rounded-xl font-bold uppercase text-[10px] tracking-widest text-text-secondary disabled:opacity-50 disabled:cursor-not-allowed">Annulla</button>
             </div>
           </div>
         </div>
