@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Plus, Trash2 } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { AppData } from '../types';
+import { safeParseLocal } from '../lib/utils';
 
 interface UpcomingSessionsProps {
   data: AppData | null;
@@ -40,7 +41,7 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <div className="text-[10px] font-mono font-bold text-brand-green uppercase tracking-tighter">
-                  {format(parseISO(fr.date), 'dd MMMM yyyy', { locale: it })}
+                  {format(safeParseLocal(fr.date), 'dd MMMM yyyy', { locale: it })}
                 </div>
                 {fr.from && (
                   <div className="text-[9px] font-mono font-bold text-text-secondary bg-white/5 px-1.5 py-0.5 rounded">
