@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { Eye } from 'lucide-react';
 
 import { useAppData } from './hooks/useAppData';
 import { Rehearsal, FutureRehearsal, Concert } from './types';
+import { safeParseLocal } from './lib/utils';
 
 // Components
 import { Header } from './components/Header';
@@ -88,12 +89,12 @@ const App = () => {
     let nextStep = Promise.resolve(true);
     
     if (data?.next?.date) {
-      const payD = new Date(paymentDate); payD.setHours(0,0,0,0);
-      const nextD = new Date(data.next.date); nextD.setHours(0,0,0,0);
+      const payD = safeParseLocal(paymentDate); payD.setHours(12,0,0,0);
+      const nextD = safeParseLocal(data.next.date); nextD.setHours(12,0,0,0);
       
       if (payD.getTime() === nextD.getTime()) {
         if (data.futureRehearsals.length > 0) {
-          const sorted = [...data.futureRehearsals].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          const sorted = [...data.futureRehearsals].sort((a,b) => safeParseLocal(a.date).getTime() - safeParseLocal(b.date).getTime());
           const toPromote = sorted[0];
           const newNext = {
             date: toPromote.date,
@@ -127,7 +128,7 @@ const App = () => {
 
   const formatRehearsalForShare = (r: Rehearsal | FutureRehearsal) => {
     const sala = data?.customRooms.find(s => s.id === r.room);
-    const dateStr = format(parseISO(r.date), 'EEEE d MMMM', { locale: it });
+    const dateStr = format(safeParseLocal(r.date), 'EEEE d MMMM', { locale: it });
     let text = `🎸 PROSSIMA PROVA GREEN DAZE!\n\n📅 ${dateStr}\n`;
     if (r.from && r.to) text += `🕒 Dalle ${r.from} alle ${r.to}\n`;
     text += `📍 ${sala?.name || 'Da definire'}\n`;
@@ -199,6 +200,7 @@ const App = () => {
       <ConcertsBlock 
         data={data} 
         setShowAddConcert={setShowAddConcert} 
+        setConcertForm={setConcertForm}
         apiAction={apiAction} 
         shareInfo={shareInfo} 
       />
