@@ -89,7 +89,9 @@ export const Modals: React.FC<ModalsProps> = ({
               )}
               {showAddConcert && (
                 <div className="space-y-6">
-                  <h3 className="text-2xl font-display font-black uppercase tracking-tight text-brand-green border-b border-brand-green/20 pb-4 flex items-center gap-3"><Music size={24}/> Nuovo Concerto</h3>
+                  <h3 className="text-2xl font-display font-black uppercase tracking-tight text-brand-green border-b border-brand-green/20 pb-4 flex items-center gap-3">
+                    <Music size={24}/> {concertForm.id ? "Modifica Concerto" : "Nuovo Concerto"}
+                  </h3>
                   <div className="space-y-4">
                     <input type="date" className="w-full bg-brand-dark border border-brand-border p-4 rounded-xl font-bold" value={concertForm.date} onChange={e => setConcertForm({...concertForm, date: e.target.value})} />
                     <input type="text" className="w-full bg-brand-dark border border-brand-border p-4 rounded-xl font-bold" placeholder="NOME LOCALE (E.g. ALCATRAZ)" value={concertForm.name} onChange={e => setConcertForm({...concertForm, name: e.target.value})} />
@@ -100,7 +102,16 @@ export const Modals: React.FC<ModalsProps> = ({
                         if (isPending) return;
                         setIsPending(true);
                         try {
-                          const success = await apiAction('add_concert', { concert: { id: 'conc_' + Date.now(), ...concertForm } });
+                          let success = false;
+                          if (concertForm.id) {
+                            // Delete existing and re-add updated
+                            const deleteSuccess = await apiAction('delete_concert', { id: concertForm.id });
+                            if (deleteSuccess) {
+                              success = await apiAction('add_concert', { concert: concertForm });
+                            }
+                          } else {
+                            success = await apiAction('add_concert', { concert: { id: 'conc_' + Date.now(), ...concertForm } });
+                          }
                           if (success) setShowAddConcert(false);
                         } finally {
                           setIsPending(false);
@@ -116,10 +127,10 @@ export const Modals: React.FC<ModalsProps> = ({
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Aggiunta in corso...
+                          Salvataggio...
                         </>
                       ) : (
-                        "AGGIUNGI CONCERTO"
+                        concertForm.id ? "SALVA MODIFICHE" : "AGGIUNGI CONCERTO"
                       )}
                     </button>
                   </div>
