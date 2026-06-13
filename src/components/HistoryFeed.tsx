@@ -1,8 +1,9 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { History, ChevronUp, ChevronDown } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { AppData } from '../types';
+import { safeParseLocal } from '../lib/utils';
 
 interface HistoryFeedProps {
   data: AppData | null;
@@ -40,7 +41,7 @@ export const HistoryFeed: React.FC<HistoryFeedProps> = ({
           >
             {data?.payments.slice().reverse().map((p, idx) => (
               <div key={idx} className="flex justify-between items-center py-3 border-b border-brand-border/50 last:border-0 hover:bg-white/5 transition-colors px-2 rounded-lg">
-                <span className="font-mono text-[10px] uppercase font-bold text-text-secondary">{format(parseISO(p.date), 'dd MMM yyyy')}</span>
+                <span className="font-mono text-[10px] uppercase font-bold text-text-secondary">{format(safeParseLocal(p.date), 'dd MMM yyyy')}</span>
                 <span className="font-black text-xs tracking-widest uppercase" style={{ color: data.members.find(m => m.name === p.payer)?.color }}>{p.payer}</span>
               </div>
             ))}
