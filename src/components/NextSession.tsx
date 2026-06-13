@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Music, Clock, MapPin, Send, Settings, TrendingUp, AlertCircle } from 'lucide-react';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { AppData, Member } from '../types';
+import { safeParseLocal } from '../lib/utils';
 
 interface NextSessionProps {
   data: AppData | null;
@@ -35,7 +36,7 @@ export const NextSession: React.FC<NextSessionProps> = ({
         <div className="space-y-6">
           <div className="text-center">
             <div className="text-3xl font-display font-extrabold uppercase leading-none mb-3 glow-green text-brand-green">
-              {format(parseISO(data.next.date), 'EEEE d MMMM', { locale: it })}
+              {format(safeParseLocal(data.next.date), 'EEEE d MMMM', { locale: it })}
             </div>
             <div className="flex items-center justify-center gap-4 text-text-primary font-mono text-sm font-bold opacity-80">
               <span className="flex items-center gap-2 text-lg"><Clock size={18} className="text-brand-green"/> {data.next.from} {data.next.to && `— ${data.next.to}`}</span>
