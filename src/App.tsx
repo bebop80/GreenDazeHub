@@ -48,8 +48,8 @@ const App = () => {
   // Form States
   const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedPayer, setSelectedPayer] = useState('');
-  const [rehearsalForm, setRehearsalForm] = useState<Rehearsal>({ date: '', from: '', to: '', room: '', notes: '' });
-  const [futureForm, setFutureForm] = useState<Partial<FutureRehearsal>>({ date: '', from: '', to: '', room: '' });
+  const [rehearsalForm, setRehearsalForm] = useState<Rehearsal>({ date: '', from: '', to: '', room: '', notes: '', sharedExpense: false });
+  const [futureForm, setFutureForm] = useState<Partial<FutureRehearsal>>({ date: '', from: '', to: '', room: '', sharedExpense: false });
   const [concertForm, setConcertForm] = useState<Partial<Concert>>({ date: '', name: '', address: '' });
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -68,12 +68,18 @@ const App = () => {
 
   useEffect(() => {
     if (data?.next) {
+      const isShared = !!data.next.sharedExpense || 
+        (data.next.sharedExpense as any) === 'true' || 
+        (data.next.sharedExpense as any) === 'TRUE' || 
+        (!!data.next.notes && data.next.notes.includes('[SPESA_CONDIVISA]'));
+      const cleanNotes = (data.next.notes || '').replace(/\[SPESA_CONDIVISA\]/g, '').trim();
       setRehearsalForm({
         date: data.next.date?.substring(0, 10) || '',
         from: data.next.from || '',
         to: data.next.to || '',
         room: data.next.room || '',
-        notes: data.next.notes || ''
+        notes: cleanNotes,
+        sharedExpense: isShared
       });
     }
   }, [data]);
@@ -96,12 +102,18 @@ const App = () => {
         if (data.futureRehearsals.length > 0) {
           const sorted = [...data.futureRehearsals].sort((a,b) => safeParseLocal(a.date).getTime() - safeParseLocal(b.date).getTime());
           const toPromote = sorted[0];
+          const isPromoteShared = !!toPromote.sharedExpense || 
+            (toPromote.sharedExpense as any) === 'true' || 
+            (toPromote.sharedExpense as any) === 'TRUE' || 
+            (!!toPromote.notes && toPromote.notes.includes('[SPESA_CONDIVISA]'));
+          const cleanNotes = (toPromote.notes || '').replace(/\[SPESA_CONDIVISA\]/g, '').trim();
           const newNext = {
             date: toPromote.date,
             from: toPromote.from || '',
             to: toPromote.to || '',
             room: toPromote.room || '',
-            notes: ''
+            notes: isPromoteShared ? `${cleanNotes} [SPESA_CONDIVISA]`.trim() : cleanNotes,
+            sharedExpense: isPromoteShared
           };
           nextStep = apiAction('next_rehearsal', { next: newNext }).then(() => 
             apiAction('delete_future_rehearsal', { id: toPromote.id })
@@ -133,7 +145,15 @@ const App = () => {
     if (r.from && r.to) text += `🕒 Dalle ${r.from} alle ${r.to}\n`;
     text += `📍 ${sala?.name || 'Da definire'}\n`;
     if (sala?.address) text += `🗺️ https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sala.address)}\n`;
-    if (calcolaTurno) text += `💰 Tocca pagare a: ${calcolaTurno.name}`;
+    const isShared = !!r.sharedExpense || 
+      (r.sharedExpense as any) === 'true' || 
+      (r.sharedExpense as any) === 'TRUE' || 
+      (!!r.notes && r.notes.includes('[SPESA_CONDIVISA]'));
+    if (isShared) {
+      text += `💰 Spesa condivisa`;
+    } else if (calcolaTurno) {
+      text += `💰 Tocca pagare a: ${calcolaTurno.name}`;
+    }
     return text;
   };
 
@@ -180,6 +200,7 @@ const App = () => {
       <UpcomingSessions 
         data={data} 
         setShowAddFuture={setShowAddFuture} 
+        setFutureForm={setFutureForm}
         apiAction={apiAction} 
       />
 
