@@ -21,6 +21,11 @@ export const NextSession: React.FC<NextSessionProps> = ({
   shareInfo,
   formatRehearsalForShare 
 }) => {
+  const isSharedExpense = !!data?.next?.sharedExpense || 
+    (data?.next?.sharedExpense as any) === 'true' || 
+    (data?.next?.sharedExpense as any) === 'TRUE' || 
+    (!!data?.next?.notes && data.next.notes.includes('[SPESA_CONDIVISA]'));
+
   return (
     <section className="glass-card p-6 relative overflow-hidden glow-border">
       <div className="absolute top-0 right-0 p-4 opacity-10">
@@ -74,15 +79,21 @@ export const NextSession: React.FC<NextSessionProps> = ({
             </div>
           </div>
 
-          {calcolaTurno && (
+          {(isSharedExpense || calcolaTurno) && (
             <div className="bg-brand-green/5 border border-brand-green/20 rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <TrendingUp size={24} className="text-brand-green" />
                 <div>
                   <div className="text-[10px] uppercase font-black text-brand-green/70 tracking-widest mb-1">Turno Pagamento</div>
-                  <div className="font-display font-bold text-xl leading-none" style={{ color: calcolaTurno.color }}>
-                    {calcolaTurno.name}
-                  </div>
+                  {isSharedExpense ? (
+                    <div className="font-display font-bold text-xl leading-none text-brand-green">
+                      Spesa condivisa
+                    </div>
+                  ) : calcolaTurno ? (
+                    <div className="font-display font-bold text-xl leading-none" style={{ color: calcolaTurno.color }}>
+                      {calcolaTurno.name}
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
