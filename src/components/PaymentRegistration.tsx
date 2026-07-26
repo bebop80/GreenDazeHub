@@ -87,6 +87,7 @@ export const PaymentRegistration: React.FC<PaymentRegistrationProps> = ({
                 >
                   <option value="">Seleziona Membro...</option>
                   {data?.members.map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
+                  <option value="Spesa condivisa" className="text-brand-green font-bold">🤝 Spesa condivisa</option>
                   <option value="ADD_MEMBER" className="text-brand-green font-bold">➕ AGGIUNGI/MODIFICA MEMBRI...</option>
                 </select>
               </div>

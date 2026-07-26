@@ -55,7 +55,7 @@ export const HistoryFeed: React.FC<HistoryFeedProps> = ({
               <div key={idx} className="flex justify-between items-center py-3 border-b border-brand-border/50 last:border-0 hover:bg-white/5 transition-colors px-2 rounded-lg">
                 <span className="font-mono text-[10px] uppercase font-bold text-text-secondary">{format(safeParseLocal(p.date), 'dd MMM yyyy')}</span>
                 <div className="flex items-center gap-3">
-                  <span className="font-black text-xs tracking-widest uppercase" style={{ color: data.members.find(m => m.name === p.payer)?.color }}>{p.payer}</span>
+                  <span className="font-black text-xs tracking-widest uppercase" style={{ color: p.payer === 'Spesa condivisa' ? '#2d9a56' : (data.members.find(m => m.name === p.payer)?.color || '#2d9a56') }}>{p.payer}</span>
                   {idx === 0 && (
                     <button 
                       disabled={isDeleting}

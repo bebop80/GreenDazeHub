@@ -82,8 +82,16 @@ const App = () => {
         notes: cleanNotes,
         sharedExpense: isShared
       });
+
+      if (isShared) {
+        setSelectedPayer('Spesa condivisa');
+      } else if (calcolaTurno?.name) {
+        setSelectedPayer(prev => (prev === '' || prev === 'Spesa condivisa') ? calcolaTurno.name : prev);
+      }
+    } else if (calcolaTurno?.name) {
+      setSelectedPayer(prev => (prev === '' || prev === 'Spesa condivisa') ? calcolaTurno.name : prev);
     }
-  }, [data]);
+  }, [data, calcolaTurno]);
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
