@@ -19,6 +19,7 @@ import { AnalyticsSection } from './components/AnalyticsSection';
 import { ConcertsBlock } from './components/ConcertsBlock';
 import { HistoryFeed } from './components/HistoryFeed';
 import { Toast } from './components/Toast';
+import { PunkBackground } from './components/PunkBackground';
 
 // Modals
 import { SettingsModal } from './components/modals/SettingsModal';
@@ -158,22 +159,27 @@ const App = () => {
   };
 
   if (loading && !data) return (
-    <div className="min-h-screen flex flex-col items-center justify-center space-y-6">
-      <motion.div 
-        animate={{ rotate: 360 }} 
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-      >
-        <Eye size={64} className="text-brand-green" />
-      </motion.div>
-      <p className="font-display font-semibold text-lg tracking-wider animate-pulse uppercase">
-        Sincronizzazione Dati...
-      </p>
+    <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center space-y-6 relative overflow-hidden text-text-primary">
+      <PunkBackground theme={theme} />
+      <div className="relative z-10 flex flex-col items-center justify-center space-y-6">
+        <motion.div 
+          animate={{ rotate: 360 }} 
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        >
+          <Eye size={64} className="text-brand-green" />
+        </motion.div>
+        <p className="font-display font-semibold text-lg tracking-wider animate-pulse uppercase">
+          Sincronizzazione Dati...
+        </p>
+      </div>
     </div>
   );
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8 space-y-8 pb-24 font-sans text-text-primary">
-      <Header theme={theme} toggleTheme={toggleTheme} lastSync={lastSync} />
+    <div className="min-h-screen bg-brand-dark transition-colors duration-300 relative">
+      <PunkBackground theme={theme} />
+      <div className="relative z-10 max-w-xl mx-auto px-4 py-8 space-y-8 pb-24 font-sans text-text-primary">
+        <Header theme={theme} toggleTheme={toggleTheme} lastSync={lastSync} />
 
       <SettingsModal 
         showSettings={showSettings} 
@@ -263,6 +269,7 @@ const App = () => {
       />
 
       <Toast toast={toast} />
+      </div>
     </div>
   );
 };
