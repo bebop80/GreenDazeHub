@@ -57,9 +57,9 @@ export const NotesSection: React.FC<NotesSectionProps> = ({
         <div className="bg-brand-dark border border-brand-border rounded-2xl p-6 italic relative">
           <div className="absolute top-0 right-0 p-3 opacity-5 italic font-mono text-9xl pointer-events-none">"</div>
           {data?.next?.notes ? (
-            <p className="text-zinc-300 text-sm leading-relaxed whitespace-pre-wrap relative z-10">{data.next.notes}</p>
+            <p className="text-text-primary text-sm leading-relaxed whitespace-pre-wrap relative z-10 font-medium">{data.next.notes}</p>
           ) : (
-            <p className="text-zinc-600 text-xs uppercase tracking-widest text-center py-4">Nessuna nota attiva</p>
+            <p className="text-text-secondary opacity-70 text-xs uppercase tracking-widest text-center py-4">Nessuna nota attiva</p>
           )}
         </div>
       )}
