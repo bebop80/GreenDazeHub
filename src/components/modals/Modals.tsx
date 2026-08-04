@@ -82,8 +82,10 @@ export const Modals: React.FC<ModalsProps> = ({
                           const isShared = !!futureForm.sharedExpense;
                           const cleanNotes = (futureForm.notes || '').replace(/\[SPESA_CONDIVISA\]/g, '').trim();
                           const finalNotes = isShared ? `${cleanNotes} [SPESA_CONDIVISA]`.trim() : cleanNotes;
+                          const targetId = futureForm.id || ('fut_' + Date.now());
                           const payloadFuture = {
                             ...futureForm,
+                            id: targetId,
                             notes: finalNotes,
                             sharedExpense: isShared
                           };
@@ -94,7 +96,7 @@ export const Modals: React.FC<ModalsProps> = ({
                               success = await apiAction('add_future_rehearsal', { rehearsal: payloadFuture });
                             }
                           } else {
-                            success = await apiAction('add_future_rehearsal', { rehearsal: { id: 'fut_' + Date.now(), ...payloadFuture } });
+                            success = await apiAction('add_future_rehearsal', { rehearsal: payloadFuture });
                           }
                           if (success) setShowAddFuture(false);
                         } finally {
@@ -136,14 +138,22 @@ export const Modals: React.FC<ModalsProps> = ({
                         setIsPending(true);
                         try {
                           let success = false;
+                          const targetId = concertForm.id || ('conc_' + Date.now());
+                          const concertPayload = {
+                            id: targetId,
+                            date: concertForm.date || '',
+                            name: concertForm.name || '',
+                            address: concertForm.address || ''
+                          };
+
                           if (concertForm.id) {
                             // Delete existing and re-add updated
                             const deleteSuccess = await apiAction('delete_concert', { id: concertForm.id });
                             if (deleteSuccess) {
-                              success = await apiAction('add_concert', { concert: concertForm });
+                              success = await apiAction('add_concert', { concert: concertPayload });
                             }
                           } else {
-                            success = await apiAction('add_concert', { concert: { id: 'conc_' + Date.now(), ...concertForm } });
+                            success = await apiAction('add_concert', { concert: concertPayload });
                           }
                           if (success) setShowAddConcert(false);
                         } finally {
