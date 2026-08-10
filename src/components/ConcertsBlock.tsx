@@ -58,45 +58,46 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
               <div 
                 key={c.id} 
                 className={cn(
-                  "border rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 transition-all relative",
+                  "border rounded-2xl p-4 sm:p-5 flex flex-col gap-3 transition-all relative",
                   isNext && "bg-brand-green/20 border-brand-green shadow-[0_0_35px_-5px_#2d9a56] ring-2 ring-brand-green/30 border-l-8 border-l-brand-green scale-[1.01] sm:scale-[1.02]",
                   !isPast && !isNext && "bg-brand-green/10 border-brand-green/40 shadow-[0_0_15px_-5px_#2d9a56]",
                   isPast && "bg-brand-dark/30 border-brand-border opacity-70 grayscale-[0.3]"
                 )}
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between sm:justify-start gap-2 mb-1.5 flex-wrap">
-                    <span className={cn(
-                      "text-[12px] font-mono font-bold uppercase tracking-widest",
-                      isPast ? "text-zinc-500" : "text-brand-green"
-                    )}>
-                      {format(dateObj, 'dd MMM yyyy')}
+                {/* Header Info: Date & Badge */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <span className={cn(
+                    "text-xs font-mono font-bold uppercase tracking-widest",
+                    isPast ? "text-zinc-500" : "text-brand-green"
+                  )}>
+                    {format(dateObj, 'dd MMMM yyyy', { locale: undefined })}
+                  </span>
+                  {isNext && (
+                    <span className="px-2.5 py-0.5 bg-brand-green text-black font-mono font-bold text-[10px] uppercase tracking-wider rounded-full shadow-sm">
+                      Prossimo Live
                     </span>
-                    {isNext && (
-                      <span className="px-2.5 py-0.5 bg-brand-green text-black font-mono font-bold text-[10px] uppercase tracking-wider rounded-full shadow-sm">
-                        Prossimo Live
-                      </span>
-                    )}
-                  </div>
+                  )}
+                </div>
 
+                {/* Main Info: Full width Title & Address */}
+                <div className="space-y-1">
                   <div className={cn(
-                    "font-display font-extrabold text-lg text-text-primary break-words",
+                    "font-display font-extrabold text-lg text-text-primary break-words leading-tight",
                     isNext && "text-xl text-white font-black"
                   )}>
                     {c.name}
                   </div>
 
                   {c.address && (
-                    <div className="text-xs font-medium flex items-start sm:items-center gap-1.5 text-text-secondary mt-1.5 break-words">
-                      <MapPin size={13} className={cn("mt-0.5 sm:mt-0 shrink-0", isPast ? "text-zinc-500" : "text-brand-green")}/> 
+                    <div className="text-xs font-medium flex items-start gap-1.5 text-text-secondary pt-0.5 break-words">
+                      <MapPin size={14} className={cn("mt-0.5 shrink-0", isPast ? "text-zinc-500" : "text-brand-green")}/> 
                       <span>{c.address}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Actions Toolbar */}
-                <div className="flex items-center justify-end gap-1 pt-2.5 sm:pt-0 border-t border-brand-border/30 sm:border-0 shrink-0 relative">
-                  {/* Calendar Export Button */}
+                {/* Footer Toolbar: Action icons at the bottom */}
+                <div className="pt-2.5 border-t border-white/10 flex items-center justify-end gap-1.5">
                   <button
                     onClick={() => setCalendarItem({
                       title: `🎤 Concerto: ${c.name}`,
@@ -104,16 +105,17 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                       location: c.address || '',
                       description: 'Live della band'
                     })}
-                    className="p-2.5 sm:p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+                    className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer"
                     title="Aggiungi al calendario"
                   >
                     <Calendar size={18} />
+                    <span className="hidden sm:inline text-xs">Calendario</span>
                   </button>
 
                   {!isPast && (
                     <button 
-                      onClick={() => shareInfo(`🎤 Concerto: ${c.name}\n📅 ${format(dateObj, 'd MMMM yyyy')}\n📍 ${c.address}`, 'wa')}
-                      className="p-2.5 sm:p-3 text-zinc-400 hover:bg-brand-green hover:text-black rounded-xl transition-all"
+                      onClick={() => shareInfo(`🎤 Concerto: ${c.name}\n📅 ${format(dateObj, 'd MMMM yyyy')}\n📍 ${c.address || ''}`, 'wa')}
+                      className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
                       title="Condividi su WhatsApp"
                     >
                       <Share2 size={18} />
@@ -124,7 +126,7 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                       setConcertForm({ id: c.id, date: toLocalYYYYMMDD(c.date), name: c.name, address: c.address || '' });
                       setShowAddConcert(true);
                     }}
-                    className="p-2.5 sm:p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all"
+                    className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
                     title="Modifica concerto"
                   >
                     <Pencil size={18} />
@@ -139,7 +141,7 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                         setDeletingId(null);
                       }
                     }} 
-                    className="p-3 text-red-500 hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-50"
+                    className="p-2 sm:p-2.5 text-red-500 hover:bg-red-500/10 rounded-xl transition-all disabled:opacity-50 cursor-pointer"
                     title="Elimina concerto"
                   >
                     {deletingId === c.id ? (

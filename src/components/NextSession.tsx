@@ -51,53 +51,82 @@ export const NextSession: React.FC<NextSessionProps> = ({
             </div>
           </div>
 
-          <div className="bg-brand-dark/80 border border-brand-border rounded-2xl p-4 flex flex-col gap-4">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-3">
-                 <div className="bg-brand-green/20 p-2.5 rounded-lg">
-                  <Music size={20} className="text-brand-green" />
+          <div className="bg-brand-dark/80 border border-brand-border rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
+            {/* Header / Room Name & Address */}
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="bg-brand-green/20 p-2 rounded-lg text-brand-green">
+                  <Music size={18} />
                 </div>
-                <div>
-                  <div className="text-[10px] uppercase font-black text-brand-green/70 tracking-widest mb-1">SALA PROVE</div>
-                  <div className="font-bold text-base leading-tight text-text-primary">{data.customRooms.find(r => r.id === data.next.room)?.name || 'DA DEFINIRE'}</div>
+                <div className="text-[10px] uppercase font-black text-brand-green/80 tracking-widest">
+                  SALA PROVE
                 </div>
               </div>
-              <div className="flex gap-2">
-                {data.customRooms.find(r => r.id === data.next.room)?.address && (
-                  <a 
-                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.customRooms.find(r => r.id === data.next.room)!.address!)}`}
-                    target="_blank"
-                    className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green"
-                    title="Mappa"
-                  >
-                    <MapPin size={18} />
-                  </a>
-                )}
-                <button
-                  onClick={() => {
-                    const roomObj = data.customRooms.find(r => r.id === data.next.room);
-                    setCalendarItem({
-                      title: `🎵 Prova Band${roomObj?.name ? `: ${roomObj.name}` : ''}`,
-                      date: data.next.date,
-                      timeFrom: data.next.from,
-                      timeTo: data.next.to,
-                      location: roomObj?.address || roomObj?.name || '',
-                      description: `Prova della band in ${roomObj?.name || 'sala prove'}`
-                    });
-                  }}
-                  className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green cursor-pointer"
-                  title="Aggiungi al calendario"
-                >
-                  <Calendar size={18} />
-                </button>
-                <button 
-                  onClick={() => shareInfo(formatRehearsalForShare(data.next), 'wa')}
-                  className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green"
-                  title="Condividi su WhatsApp"
-                >
-                  <Send size={18} />
-                </button>
-              </div>
+
+              {(() => {
+                const roomObj = data.customRooms.find(r => r.id === data.next.room);
+                return (
+                  <>
+                    <div className="font-display font-bold text-lg text-text-primary leading-tight break-words">
+                      {roomObj?.name || 'DA DEFINIRE'}
+                    </div>
+
+                    {roomObj?.address && (
+                      <div className="text-xs font-medium flex items-start gap-1.5 text-text-secondary break-words pt-0.5">
+                        <MapPin size={14} className="mt-0.5 text-brand-green shrink-0" />
+                        <span>{roomObj.address}</span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Actions Footer */}
+            <div className="pt-2.5 border-t border-white/10 flex items-center justify-end gap-1.5">
+              {(() => {
+                const roomObj = data.customRooms.find(r => r.id === data.next.room);
+                return (
+                  <>
+                    {roomObj?.address && (
+                      <a 
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(roomObj.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                        title="Mappa"
+                      >
+                        <MapPin size={18} />
+                        <span className="hidden sm:inline text-xs">Mappa</span>
+                      </a>
+                    )}
+                    <button
+                      onClick={() => {
+                        setCalendarItem({
+                          title: `🎵 Prova Band${roomObj?.name ? `: ${roomObj.name}` : ''}`,
+                          date: data.next.date,
+                          timeFrom: data.next.from,
+                          timeTo: data.next.to,
+                          location: roomObj?.address || roomObj?.name || '',
+                          description: `Prova della band in ${roomObj?.name || 'sala prove'}`
+                        });
+                      }}
+                      className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                      title="Aggiungi al calendario"
+                    >
+                      <Calendar size={18} />
+                      <span className="hidden sm:inline text-xs">Calendario</span>
+                    </button>
+                    <button 
+                      onClick={() => shareInfo(formatRehearsalForShare(data.next), 'wa')}
+                      className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
+                      title="Condividi su WhatsApp"
+                    >
+                      <Send size={18} />
+                    </button>
+                  </>
+                );
+              })()}
             </div>
           </div>
 
