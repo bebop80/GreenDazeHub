@@ -21,9 +21,10 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
  }) => {
   const [showPast, setShowPast] = React.useState(false);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
-  const [calendarMenuId, setCalendarMenuId] = React.useState<string | null>(null);
+  const [selectedCalendarConcert, setSelectedCalendarConcert] = React.useState<any | null>(null);
 
   const createGoogleCalendarUrl = (c: any) => {
+    if (!c) return '#';
     const dateObj = safeParseLocal(c.date);
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -39,7 +40,8 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
   };
 
-  const downloadIcsFile = (c: any) => {
+  const createIcsDataUrl = (c: any) => {
+    if (!c) return '';
     const dateObj = safeParseLocal(c.date);
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -65,16 +67,7 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
       'END:VCALENDAR'
     ].join('\r\n');
 
-    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    const fileName = `${c.name.replace(/[^a-zA-Z0-9]/g, '_')}_concerto.ics`;
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    return `data:text/calendar;charset=utf-8,${encodeURIComponent(icsContent)}`;
   };
 
   return (
@@ -106,7 +99,6 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
           const renderConcertCard = (c: any, isPast: boolean) => {
             const dateObj = safeParseLocal(c.date);
             const isNext = c.id === nextConcertId;
-            const isCalendarOpen = calendarMenuId === c.id;
             
             return (
               <div 
@@ -150,86 +142,14 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
 
                 {/* Actions Toolbar */}
                 <div className="flex items-center justify-end gap-1 pt-2.5 sm:pt-0 border-t border-brand-border/30 sm:border-0 shrink-0 relative">
-                  {/* Calendar Export Button & Modal */}
-                  <div>
-                    <button
-                      onClick={() => setCalendarMenuId(isCalendarOpen ? null : c.id)}
-                      className={cn(
-                        "p-2.5 sm:p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium",
-                        isCalendarOpen && "text-brand-green bg-brand-green/20"
-                      )}
-                      title="Aggiungi al calendario"
-                    >
-                      <Calendar size={18} />
-                    </button>
-
-                    {isCalendarOpen && (
-                      <div 
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
-                        onClick={() => setCalendarMenuId(null)}
-                      >
-                        <div 
-                          className="bg-[#18181b] border border-brand-green/40 rounded-2xl p-5 w-full max-w-sm shadow-2xl space-y-4 text-left relative"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <div className="flex items-center justify-between pb-3 border-b border-brand-border/60">
-                            <div className="flex items-center gap-2 text-brand-green font-bold text-base">
-                              <Calendar size={20} />
-                              <span>Aggiungi al Calendario</span>
-                            </div>
-                            <button 
-                              onClick={() => setCalendarMenuId(null)}
-                              className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-                              title="Chiudi"
-                            >
-                              <X size={18} />
-                            </button>
-                          </div>
-
-                          <div className="text-xs text-zinc-300 bg-[#111113] p-3 rounded-xl border border-brand-border/50">
-                            <div className="font-bold text-white text-sm">{c.name}</div>
-                            <div className="text-brand-green font-mono text-xs mt-0.5">{format(dateObj, 'dd MMMM yyyy')}</div>
-                            {c.address && (
-                              <div className="text-zinc-400 text-xs mt-1 flex items-center gap-1.5 break-words">
-                                <MapPin size={12} className="shrink-0 text-brand-green" />
-                                <span>{c.address}</span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="space-y-2.5 pt-1">
-                            <a
-                              href={createGoogleCalendarUrl(c)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() => setCalendarMenuId(null)}
-                              className="flex items-center gap-3 p-3.5 bg-[#222226] hover:bg-brand-green/20 border border-brand-border hover:border-brand-green/60 rounded-xl text-white font-medium text-sm transition-all group"
-                            >
-                              <span className="text-2xl">📅</span>
-                              <div className="flex flex-col">
-                                <span className="font-semibold text-white group-hover:text-brand-green transition-colors">Google Calendar</span>
-                                <span className="text-[11px] text-zinc-400">Apri web o app Google Calendar</span>
-                              </div>
-                            </a>
-
-                            <button
-                              onClick={() => {
-                                downloadIcsFile(c);
-                                setCalendarMenuId(null);
-                              }}
-                              className="w-full flex items-center gap-3 p-3.5 bg-[#222226] hover:bg-brand-green/20 border border-brand-border hover:border-brand-green/60 rounded-xl text-white font-medium text-sm transition-all group text-left"
-                            >
-                              <span className="text-2xl">🍏</span>
-                              <div className="flex flex-col">
-                                <span className="font-semibold text-white group-hover:text-brand-green transition-colors">Apple / Calendario Nativo (.ics)</span>
-                                <span className="text-[11px] text-zinc-400">Scarica ed apri nell'app calendario</span>
-                              </div>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Calendar Export Button */}
+                  <button
+                    onClick={() => setSelectedCalendarConcert(c)}
+                    className="p-2.5 sm:p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+                    title="Aggiungi al calendario"
+                  >
+                    <Calendar size={18} />
+                  </button>
 
                   {!isPast && (
                     <button 
@@ -316,6 +236,75 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
           );
         })()}
       </div>
+      {/* Calendar Export Modal */}
+      {selectedCalendarConcert && (
+        <div 
+          className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+          onClick={() => setSelectedCalendarConcert(null)}
+        >
+          <div 
+            style={{ backgroundColor: '#18181b', color: '#ffffff' }}
+            className="border border-brand-green/50 rounded-2xl p-5 w-full max-w-sm shadow-2xl space-y-4 text-left relative z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-700/60">
+              <div className="flex items-center gap-2 text-brand-green font-bold text-base">
+                <Calendar size={20} />
+                <span>Aggiungi al Calendario</span>
+              </div>
+              <button 
+                onClick={() => setSelectedCalendarConcert(null)}
+                className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                title="Chiudi"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="text-xs text-zinc-300 bg-[#111113] p-3 rounded-xl border border-zinc-800">
+              <div className="font-bold text-white text-sm">{selectedCalendarConcert.name}</div>
+              <div className="text-brand-green font-mono text-xs mt-0.5 font-bold">
+                {format(safeParseLocal(selectedCalendarConcert.date), 'dd MMMM yyyy')}
+              </div>
+              {selectedCalendarConcert.address && (
+                <div className="text-zinc-400 text-xs mt-1 flex items-center gap-1.5 break-words">
+                  <MapPin size={12} className="shrink-0 text-brand-green" />
+                  <span>{selectedCalendarConcert.address}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-2.5 pt-1">
+              <a
+                href={createGoogleCalendarUrl(selectedCalendarConcert)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setSelectedCalendarConcert(null)}
+                className="flex items-center gap-3 p-3.5 bg-[#222226] hover:bg-brand-green/20 border border-zinc-700 hover:border-brand-green/60 rounded-xl text-white font-medium text-sm transition-all group cursor-pointer"
+              >
+                <span className="text-2xl">📅</span>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-white group-hover:text-brand-green transition-colors">Google Calendar</span>
+                  <span className="text-[11px] text-zinc-400">Apri web o app Google Calendar</span>
+                </div>
+              </a>
+
+              <a
+                href={createIcsDataUrl(selectedCalendarConcert)}
+                download={`${(selectedCalendarConcert.name || 'concerto').replace(/[^a-zA-Z0-9]/g, '_')}.ics`}
+                onClick={() => setSelectedCalendarConcert(null)}
+                className="w-full flex items-center gap-3 p-3.5 bg-[#222226] hover:bg-brand-green/20 border border-zinc-700 hover:border-brand-green/60 rounded-xl text-white font-medium text-sm transition-all group text-left cursor-pointer"
+              >
+                <span className="text-2xl">🍏</span>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-white group-hover:text-brand-green transition-colors">Apple / Calendario Nativo (.ics)</span>
+                  <span className="text-[11px] text-zinc-400">Scarica ed apri nell'app calendario</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
