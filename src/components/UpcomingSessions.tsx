@@ -95,11 +95,10 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
                       description: `Prova della band in ${roomObj?.name || 'sala prove'}`
                     });
                   }}
-                  className="p-2 text-zinc-400 hover:text-brand-green hover:bg-white/5 rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                  className="p-2 text-zinc-400 hover:text-brand-green hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
                   title="Aggiungi al calendario"
                 >
                   <Calendar size={17} />
-                  <span className="hidden sm:inline text-xs">Calendario</span>
                 </button>
                 <button 
                   onClick={() => {

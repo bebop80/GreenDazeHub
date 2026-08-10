@@ -105,11 +105,10 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                       location: c.address || '',
                       description: 'Live della band'
                     })}
-                    className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all flex items-center gap-1.5 text-xs font-medium cursor-pointer"
+                    className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
                     title="Aggiungi al calendario"
                   >
                     <Calendar size={18} />
-                    <span className="hidden sm:inline text-xs">Calendario</span>
                   </button>
 
                   {!isPast && (

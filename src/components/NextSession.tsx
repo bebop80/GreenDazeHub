@@ -93,11 +93,10 @@ export const NextSession: React.FC<NextSessionProps> = ({
                         href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(roomObj.address)}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                        className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
                         title="Mappa"
                       >
                         <MapPin size={18} />
-                        <span className="hidden sm:inline text-xs">Mappa</span>
                       </a>
                     )}
                     <button
@@ -111,11 +110,10 @@ export const NextSession: React.FC<NextSessionProps> = ({
                           description: `Prova della band in ${roomObj?.name || 'sala prove'}`
                         });
                       }}
-                      className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                      className="p-2 sm:p-2.5 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all cursor-pointer"
                       title="Aggiungi al calendario"
                     >
                       <Calendar size={18} />
-                      <span className="hidden sm:inline text-xs">Calendario</span>
                     </button>
                     <button 
                       onClick={() => shareInfo(formatRehearsalForShare(data.next), 'wa')}
