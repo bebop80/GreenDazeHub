@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { AppData, Member } from '../types';
 import { safeParseLocal } from '../lib/utils';
+import { CalendarExportModal, CalendarEventItem } from './modals/CalendarExportModal';
 
 interface NextSessionProps {
   data: AppData | null;
@@ -21,6 +22,8 @@ export const NextSession: React.FC<NextSessionProps> = ({
   shareInfo,
   formatRehearsalForShare 
 }) => {
+  const [calendarItem, setCalendarItem] = React.useState<CalendarEventItem | null>(null);
+
   const isSharedExpense = !!data?.next?.sharedExpense || 
     (data?.next?.sharedExpense as any) === 'true' || 
     (data?.next?.sharedExpense as any) === 'TRUE' || 
@@ -65,13 +68,32 @@ export const NextSession: React.FC<NextSessionProps> = ({
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.customRooms.find(r => r.id === data.next.room)!.address!)}`}
                     target="_blank"
                     className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green"
+                    title="Mappa"
                   >
                     <MapPin size={18} />
                   </a>
                 )}
+                <button
+                  onClick={() => {
+                    const roomObj = data.customRooms.find(r => r.id === data.next.room);
+                    setCalendarItem({
+                      title: `🎵 Prova Band${roomObj?.name ? `: ${roomObj.name}` : ''}`,
+                      date: data.next.date,
+                      timeFrom: data.next.from,
+                      timeTo: data.next.to,
+                      location: roomObj?.address || roomObj?.name || '',
+                      description: `Prova della band in ${roomObj?.name || 'sala prove'}`
+                    });
+                  }}
+                  className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green cursor-pointer"
+                  title="Aggiungi al calendario"
+                >
+                  <Calendar size={18} />
+                </button>
                 <button 
                   onClick={() => shareInfo(formatRehearsalForShare(data.next), 'wa')}
                   className="p-3 bg-brand-green/10 border border-brand-green/30 rounded-xl hover:bg-brand-green/20 transition-all text-brand-green"
+                  title="Condividi su WhatsApp"
                 >
                   <Send size={18} />
                 </button>
@@ -120,6 +142,7 @@ export const NextSession: React.FC<NextSessionProps> = ({
           </button>
         </div>
       )}
+      <CalendarExportModal item={calendarItem} onClose={() => setCalendarItem(null)} />
     </section>
   );
 };

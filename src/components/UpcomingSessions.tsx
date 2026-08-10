@@ -1,10 +1,11 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { AppData, FutureRehearsal } from '../types';
 import { safeParseLocal } from '../lib/utils';
+import { CalendarExportModal, CalendarEventItem } from './modals/CalendarExportModal';
 
 interface UpcomingSessionsProps {
   data: AppData | null;
@@ -20,6 +21,7 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
   apiAction 
 }) => {
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
+  const [calendarItem, setCalendarItem] = React.useState<CalendarEventItem | null>(null);
 
   return (
     <section className="glass-card p-6">
@@ -68,7 +70,24 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
                 {data.customRooms.find(r => r.id === fr.room)?.name || 'UNSPECIFIED HUB'}
               </div>
             </div>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-1 items-center">
+              <button
+                onClick={() => {
+                  const roomObj = data.customRooms.find(r => r.id === fr.room);
+                  setCalendarItem({
+                    title: `🎵 Prova Band${roomObj?.name ? `: ${roomObj.name}` : ''}`,
+                    date: fr.date,
+                    timeFrom: fr.from,
+                    timeTo: fr.to,
+                    location: roomObj?.address || roomObj?.name || '',
+                    description: `Prova della band in ${roomObj?.name || 'sala prove'}`
+                  });
+                }}
+                className="text-zinc-400 hover:text-brand-green hover:bg-white/5 p-2 rounded-lg transition-colors cursor-pointer"
+                title="Aggiungi al calendario"
+              >
+                <Calendar size={16} />
+              </button>
               <button 
                 onClick={() => {
                   setFutureForm({
@@ -81,7 +100,8 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
                   });
                   setShowAddFuture(true);
                 }}
-                className="text-zinc-400 hover:text-brand-green hover:bg-white/5 p-2 rounded-lg transition-colors"
+                className="text-zinc-400 hover:text-brand-green hover:bg-white/5 p-2 rounded-lg transition-colors cursor-pointer"
+                title="Modifica prova"
               >
                 <Pencil size={16} />
               </button>
@@ -95,7 +115,7 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
                     setDeletingId(null);
                   }
                 }} 
-                className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors disabled:opacity-50"
+                className="text-red-500 hover:bg-red-500/10 p-2 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
                 title="Elimina prova"
               >
                 {deletingId === fr.id ? (
@@ -116,6 +136,7 @@ export const UpcomingSessions: React.FC<UpcomingSessionsProps> = ({
           </div>
         )}
       </div>
+      <CalendarExportModal item={calendarItem} onClose={() => setCalendarItem(null)} />
     </section>
   );
 };
