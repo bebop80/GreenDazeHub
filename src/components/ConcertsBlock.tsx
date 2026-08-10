@@ -1,5 +1,5 @@
 import React from 'react';
-import { Share2, Trash2, MapPin, Plus, Pencil, ChevronDown, ChevronUp } from 'lucide-react';
+import { Share2, Trash2, MapPin, Plus, Pencil, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import { format, isFuture, isToday } from 'date-fns';
 import { AppData } from '../types';
 import { cn, safeParseLocal, toLocalYYYYMMDD } from '../lib/utils';
@@ -21,6 +21,61 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
  }) => {
   const [showPast, setShowPast] = React.useState(false);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
+  const [calendarMenuId, setCalendarMenuId] = React.useState<string | null>(null);
+
+  const createGoogleCalendarUrl = (c: any) => {
+    const dateObj = safeParseLocal(c.date);
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    
+    const startStr = `${year}${month}${day}T210000`;
+    const endStr = `${year}${month}${day}T230000`;
+
+    const title = encodeURIComponent(`🎤 Concerto: ${c.name}`);
+    const details = encodeURIComponent(`Live della band`);
+    const location = encodeURIComponent(c.address || '');
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${startStr}/${endStr}`;
+  };
+
+  const downloadIcsFile = (c: any) => {
+    const dateObj = safeParseLocal(c.date);
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    
+    const startStr = `${year}${month}${day}T210000`;
+    const endStr = `${year}${month}${day}T230000`;
+
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//BandApp//ConcertCalendar//IT',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      'BEGIN:VEVENT',
+      `SUMMARY:🎤 Concerto: ${c.name}`,
+      `LOCATION:${c.address || ''}`,
+      'DESCRIPTION:Concerto live',
+      `DTSTART:${startStr}`,
+      `DTEND:${endStr}`,
+      'STATUS:CONFIRMED',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const fileName = `${c.name.replace(/[^a-zA-Z0-9]/g, '_')}_concerto.ics`;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <section className="glass-card p-6">
@@ -44,19 +99,20 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
         {(() => {
           const sorted = [...(data?.concerts || [])].sort((a,b) => safeParseLocal(a.date).getTime() - safeParseLocal(b.date).getTime());
           const upcoming = sorted.filter(c => isFuture(safeParseLocal(c.date)) || isToday(safeParseLocal(c.date)));
-          const past = sorted.filter(c => !isFuture(safeParseLocal(c.date)) && !isToday(safeParseLocal(c.date))); // Chronological order (oldest first, or we can reverse if desired. Let's keep it chronologically ascending as requested "in ordine cronologico")
+          const past = sorted.filter(c => !isFuture(safeParseLocal(c.date)) && !isToday(safeParseLocal(c.date)));
           
           const nextConcertId = upcoming[0]?.id;
 
           const renderConcertCard = (c: any, isPast: boolean) => {
             const dateObj = safeParseLocal(c.date);
             const isNext = c.id === nextConcertId;
+            const isCalendarOpen = calendarMenuId === c.id;
             
             return (
               <div 
                 key={c.id} 
                 className={cn(
-                  "border rounded-2xl p-5 flex items-center justify-between transition-all relative overflow-hidden",
+                  "border rounded-2xl p-5 flex items-center justify-between transition-all relative",
                   isNext && "bg-brand-green/20 border-brand-green shadow-[0_0_35px_-5px_#2d9a56] ring-2 ring-brand-green/30 border-l-8 border-l-brand-green scale-[1.02]",
                   !isPast && !isNext && "bg-brand-green/10 border-brand-green/40 shadow-[0_0_15px_-5px_#2d9a56]",
                   isPast && "bg-brand-dark/30 border-brand-border opacity-70 grayscale-[0.3]"
@@ -87,11 +143,56 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                     </div>
                   )}
                 </div>
-                <div className="flex gap-1 items-center">
+
+                <div className="flex gap-1 items-center relative">
+                  {/* Calendar Export Button & Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setCalendarMenuId(isCalendarOpen ? null : c.id)}
+                      className={cn(
+                        "p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all",
+                        isCalendarOpen && "text-brand-green bg-brand-green/20"
+                      )}
+                      title="Aggiungi al calendario"
+                    >
+                      <Calendar size={18} />
+                    </button>
+
+                    {isCalendarOpen && (
+                      <>
+                        <div 
+                          className="fixed inset-0 z-40" 
+                          onClick={() => setCalendarMenuId(null)}
+                        />
+                        <div className="absolute right-0 top-12 z-50 bg-brand-dark border border-brand-border rounded-xl p-2 shadow-2xl min-w-[200px] flex flex-col gap-1 text-xs">
+                          <a
+                            href={createGoogleCalendarUrl(c)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => setCalendarMenuId(null)}
+                            className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-brand-green/10 hover:text-brand-green text-text-primary transition-colors font-medium"
+                          >
+                            <span>📅</span> Google Calendar
+                          </a>
+                          <button
+                            onClick={() => {
+                              downloadIcsFile(c);
+                              setCalendarMenuId(null);
+                            }}
+                            className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-brand-green/10 hover:text-brand-green text-text-primary transition-colors text-left font-medium"
+                          >
+                            <span>🍏</span> Apple / Calendario Nativo (.ics)
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
                   {!isPast && (
                     <button 
                       onClick={() => shareInfo(`🎤 Concerto: ${c.name}\n📅 ${format(dateObj, 'd MMMM yyyy')}\n📍 ${c.address}`, 'wa')}
-                      className="p-3 hover:bg-brand-green hover:text-black rounded-xl transition-all"
+                      className="p-3 text-zinc-400 hover:bg-brand-green hover:text-black rounded-xl transition-all"
+                      title="Condividi su WhatsApp"
                     >
                       <Share2 size={18} />
                     </button>
@@ -102,6 +203,7 @@ export const ConcertsBlock: React.FC<ConcertsBlockProps> = ({
                       setShowAddConcert(true);
                     }}
                     className="p-3 text-zinc-400 hover:text-brand-green hover:bg-brand-green/10 rounded-xl transition-all"
+                    title="Modifica concerto"
                   >
                     <Pencil size={18} />
                   </button>
