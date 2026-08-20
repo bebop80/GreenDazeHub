@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, lastSync }) 
       <div className="flex justify-center mb-4">
         <button 
           onClick={toggleTheme}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-card border border-brand-border hover:border-brand-green transition-colors text-brand-green text-[10px] font-black uppercase tracking-widest"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-card border border-brand-border hover:border-brand-green transition-colors text-brand-green text-[10px] font-black uppercase tracking-widest cursor-pointer"
         >
           {theme === 'dark' ? <Sun size={16} /> : <Eye size={16} />}
           <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
