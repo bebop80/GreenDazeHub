@@ -33,7 +33,7 @@ export const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, lastSync }) 
         <div className="flex-1 flex justify-center">
           <svg 
             viewBox="0 0 400 260" 
-            className="h-24 md:h-32 w-auto"
+            className="h-28 sm:h-32 md:h-36 w-auto drop-shadow-sm"
             aria-label="Green Daze Logo"
           >
             <defs>
