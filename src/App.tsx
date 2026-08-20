@@ -186,7 +186,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-brand-dark transition-colors duration-300 relative">
       <PunkBackground theme={theme} />
-      <div className="relative z-10 max-w-xl mx-auto px-4 py-8 space-y-8 pb-24 font-sans text-text-primary">
+      <div className="relative z-10 max-w-xl mx-auto px-4 pt-1.5 sm:pt-2.5 pb-24 space-y-8 font-sans text-text-primary">
         <Header theme={theme} toggleTheme={toggleTheme} lastSync={lastSync} />
 
       <SettingsModal 

@@ -9,8 +9,27 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, lastSync }) => {
   return (
-    <header className="text-center relative pt-4 pb-2">
-      <div className="flex justify-center items-center mb-6 px-2">
+    <header className="relative pt-0 pb-1">
+      {/* Top discreet utilities bar: Theme Toggle on left, System Sync status on right margin */}
+      <div className="flex items-center justify-between gap-2 mb-1 w-full">
+        <button 
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Passa alla modalità chiara' : 'Passa alla modalità scura'}
+          aria-label="Cambia tema chiaro/scuro"
+          className="flex items-center gap-1.5 text-text-secondary hover:text-brand-green transition-colors cursor-pointer text-[11px] font-mono font-medium select-none active:opacity-75"
+        >
+          {theme === 'dark' ? <Sun size={14} className="text-brand-green" /> : <Eye size={14} className="text-brand-green" />}
+          <span className="uppercase tracking-wider">{theme === 'dark' ? 'Light' : 'Dark'}</span>
+        </button>
+
+        <div className="flex items-center gap-1.5 text-[10px] font-mono text-text-secondary/75 select-none text-right">
+          <RefreshCcw size={10} className="animate-spin text-brand-green flex-shrink-0" />
+          <span className="truncate">SISTEMA ONLINE • SYNC {lastSync}</span>
+        </div>
+      </div>
+
+      {/* Centered Green Daze Brand Logo */}
+      <div className="flex justify-center items-center px-2 pt-2">
         <div className="flex-1 flex justify-center">
           <svg 
             viewBox="0 0 400 260" 
@@ -51,19 +70,6 @@ export const Header: React.FC<HeaderProps> = ({ theme, toggleTheme, lastSync }) 
           </svg>
         </div>
       </div>
-      <div className="flex justify-center mb-4">
-        <button 
-          onClick={toggleTheme}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-card border border-brand-border hover:border-brand-green transition-colors text-brand-green text-[10px] font-black uppercase tracking-widest cursor-pointer"
-        >
-          {theme === 'dark' ? <Sun size={16} /> : <Eye size={16} />}
-          <span>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-        </button>
-      </div>
-      <p className="text-[10px] font-mono text-text-secondary flex items-center justify-center gap-2">
-        <RefreshCcw size={10} className="animate-spin" />
-        SISTEMA ONLINE • ULTIMO SYNC {lastSync}
-      </p>
     </header>
   );
 };
