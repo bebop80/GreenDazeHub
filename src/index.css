@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --color-brand-green: #2d9a56;
+  --color-brand-green: #00a844;
   --color-brand-dark: #f8fafc;
   --color-brand-card: #ffffff;
   --color-brand-border: #94a3b8;
@@ -14,7 +14,7 @@
 }
 
 .dark {
-  --color-brand-green: #34d399;
+  --color-brand-green: #00e660;
   --color-brand-dark: #121620;
   --color-brand-card: #1e2433;
   --color-brand-border: #4a5872;
@@ -34,10 +34,10 @@
   }
 
   .glow-green {
-    text-shadow: 0 0 10px rgba(46, 160, 91, 0.5);
+    text-shadow: 0 0 12px rgba(0, 230, 96, 0.6);
   }
 
   .glow-border {
-    box-shadow: 0 0 15px rgba(46, 160, 91, 0.2);
+    box-shadow: 0 0 16px rgba(0, 230, 96, 0.25);
   }
 }
