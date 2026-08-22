@@ -35,26 +35,26 @@ export const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({ data }) => {
             data={chartData} 
             margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
           >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#1a1a1a" />
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--color-brand-border)" strokeOpacity={0.5} />
             <XAxis 
               type="number"
               allowDecimals={false}
               domain={[0, maxCount > 0 ? maxCount + 1 : 5]}
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#555', fontSize: 10 }} 
+              tick={{ fill: 'var(--text-secondary)', fontSize: 10 }} 
             />
             <YAxis 
               type="category"
               dataKey="name"
               axisLine={false} 
               tickLine={false} 
-              tick={{ fill: '#a1a1aa', fontSize: 11, fontWeight: 700 }} 
+              tick={{ fill: 'var(--text-primary)', fontSize: 11, fontWeight: 700 }} 
               width={75}
             />
             <Tooltip 
-              cursor={{ fill: 'rgba(255,255,255,0.03)' }}
-              contentStyle={{ backgroundColor: '#0a0a0a', border: '1px solid #2a2a2a', borderRadius: '12px' }}
+              cursor={{ fill: 'rgba(255,255,255,0.06)' }}
+              contentStyle={{ backgroundColor: 'var(--color-brand-card)', border: '1px solid var(--color-brand-border)', borderRadius: '12px', color: 'var(--text-primary)' }}
               formatter={(value: any) => [`${value} ${value === 1 ? 'pagamento' : 'pagamenti'}`, 'Totale']}
             />
             <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={10}>

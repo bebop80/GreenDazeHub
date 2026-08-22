@@ -35,7 +35,7 @@ export const PunkBackground: React.FC<PunkBackgroundProps> = () => {
 
       {/* Gentle vignette overlay to preserve full edge-to-edge art without dark side bars */}
       <div 
-        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_20%,_rgba(244,244,245,0.4)_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_20%,_rgba(8,8,8,0.45)_100%)] pointer-events-none" 
+        className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_20%,_rgba(244,244,245,0.4)_100%)] dark:bg-[radial-gradient(circle_at_center,_transparent_20%,_rgba(18,21,28,0.45)_100%)] pointer-events-none" 
       />
 
       {/* Subtle green ambient light glow in corners */}

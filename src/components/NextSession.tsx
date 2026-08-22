@@ -48,7 +48,7 @@ export const NextSession: React.FC<NextSessionProps> = ({
               {format(safeParseLocal(data.next.date), 'EEEE d MMMM', { locale: it })}
             </div>
             {(data.next.from || data.next.to) && (
-              <div className="inline-flex items-center justify-center gap-2 mt-2 px-3 py-1 bg-brand-dark/90 border border-brand-border/60 rounded-full font-mono text-sm font-bold text-text-primary shadow-inner">
+              <div className="inline-flex items-center justify-center gap-2 mt-2 px-3 py-1 bg-brand-dark/90 border border-brand-border rounded-full font-mono text-sm font-bold text-text-primary shadow-inner">
                 <Clock size={15} className="text-brand-green" />
                 <span>{data.next.from} {data.next.to && `— ${data.next.to}`}</span>
               </div>
